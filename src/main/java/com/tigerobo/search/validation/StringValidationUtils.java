@@ -9,9 +9,15 @@ public class StringValidationUtils {
         return false;
     }
     public static String removeNRT(String originalSql){
-        return originalSql.replaceAll("(\\\r\\\n|\\\r|\\\n|\\\n\\\r|\\\t)", "");
+        if(originalSql!=null){
+            return originalSql.replaceAll("(\\\r\\\n|\\\r|\\\n|\\\n\\\r|\\\t)", "");
+        }
+        return null;
     }
 
+    public static String remove2N2N(String originalSql){
+        return originalSql.replaceAll("\\s{1,}", " ");
+    }
     //
 
     public static String replaceValue(String target,String reg,String replaceValue){

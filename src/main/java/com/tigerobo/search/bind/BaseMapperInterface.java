@@ -1,4 +1,9 @@
 package com.tigerobo.search.bind;
 
-public interface BaseMapperInterface<T> {
+import com.tigerobo.search.annotation.Param;
+
+public interface BaseMapperInterface<S> {
+
+    S insert(@Param(value="s") S s);
+    S updateByPrimaryKey(@Param(value="s")S s);
 }

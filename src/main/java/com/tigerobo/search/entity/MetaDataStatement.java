@@ -3,13 +3,17 @@ package com.tigerobo.search.entity;
 import com.tiger.functool.base.BaseSuperDTO;
 import com.tigerobo.search.condition.ConditionParser;
 import com.tigerobo.search.condition.IfCondition;
+import com.tigerobo.search.constant.ConstantType;
 import com.tigerobo.search.factory.EsClient;
 import com.tigerobo.search.parser.ParserException;
 import com.tigerobo.search.parser.ReadHelper;
 import com.tigerobo.search.parser.SqlParser;
 import com.tigerobo.search.utils.EsClientUtils;
+import com.tigerobo.search.validation.StringValidationUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.search.sort.SortBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -18,8 +22,10 @@ import java.util.List;
 import java.util.Map;
 
 
-public class MetaDataStatement {
+public class MetaDataStatement implements Statement {
+    private static final Logger logger = LoggerFactory.getLogger(MetaDataStatement.class);
 
+    private ConstantType operateType;
     private String sql;
     private String orignalSql;
     private Exception exception;
@@ -38,6 +44,7 @@ public class MetaDataStatement {
         return exception;
     }
 
+    @Override
     public void setException(Exception exception) {
         this.exception = exception;
     }
@@ -82,41 +89,52 @@ public class MetaDataStatement {
         return ps;
     }
 
+    @Override
     public void setPs(List<Parameter> ps) {
         this.ps = ps;
         ps.forEach(val -> psMap.put(val.getType(), val));
+        List<String> paramterType = new ArrayList<>();
         if (psMap.get(BaseSuperDTO.class) == null) {
             Map<Class, Parameter> extendBaseSuper = new HashMap<>();
             for (Map.Entry<Class, Parameter> entry : psMap.entrySet()) {
                 if (entry.getValue() != null && entry.getValue().getType() != null &&
                         BaseSuperDTO.class.isAssignableFrom(entry.getValue().getType())) {
                     extendBaseSuper.put(BaseSuperDTO.class, entry.getValue());
+                }else{
+                    paramterType.add(entry.getValue().getName());
                 }
             }
-            if (extendBaseSuper.size() > 1) {
+            if (extendBaseSuper.size() > 1 && paramterType.size()>0) {
+                logger.error("the {} has more than one extend baseSuperDto",paramterType.get(0));
                 throw new ParserException("the parmeters has more than one extend baseSuperDto");
             }
-            if (extendBaseSuper.size() == 0) {
+            if (extendBaseSuper.size() == 0 && paramterType.size()>0) {
+                logger.error("one of {} must has one extend baseSuperDto",paramterType.get(0));
                 throw new ParserException("one of parmeters must has one extend baseSuperDto");
             }
             psMap.putAll(extendBaseSuper);
         }
     }
 
+    @Override
     public Object getResult(EsClient esClient) {
         String originalSql = getOrignalSql();
+        originalSql = StringValidationUtils.removeNRT(originalSql);
         ConditionParser conditionParser = new ConditionParser();
         List<IfCondition> ifConditions = conditionParser.parser(originalSql, IfCondition.class);
         for(IfCondition ifCondition:ifConditions){
             originalSql = ifCondition.conditionIfTrue(originalSql,this);
         }
+        originalSql = StringValidationUtils.remove2N2N(originalSql);
         this.setSql(originalSql);
+        logger.info("the current sql is {}",originalSql);
         ReadHelper readHelper = new ReadHelper(this);
         this.elements = readHelper.getElement();
         EsClientUtils esClientUtils = new EsClientUtils(esClient);
         Parameter parameter = psMap.get(BaseSuperDTO.class);
         if (parameter != null) {
             Object baseSuperDto = parameter.getValue();
+            psMap.clear();
             //获取解析where条件
             Element whereElement = getElementByType(elements, ElementTypeEnum.WHERE);
             if (whereElement != null) {
@@ -177,6 +195,8 @@ public class MetaDataStatement {
         return genericType;
     }
 
+
+    @Override
     public void setGenericType(Type[] genericType) {
         this.genericType = genericType;
     }

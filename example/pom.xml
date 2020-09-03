@@ -68,7 +68,7 @@
         <dependency>
             <groupId>com.tigerobo.search</groupId>
             <artifactId>elastic-search</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.10</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

@@ -1,84 +1,98 @@
 package com.tigerobo.search.condition;
 
-import java.util.List;
-
 public class AbstractCondition {
-    private String startReg;
-    private String startValue;
-    private String endReg;
-    private String endValue;
-    private String conditionIfTrue;
-    private String[] attributesReg;
-    private List<String> attributes;
-    private String totalStr;
 
-    public AbstractCondition(String startReg,String endReg,String[] attributesReg){
-        this.startReg = startReg;
-        this.endReg = endReg;
-        this.attributesReg = attributesReg;
+
+
+    private Integer startIndex;
+    private Integer endIndex;
+    private String originalSql;
+    private String conditionFragmentReg;
+    private String conditionJudgeReg;
+    private String conditionSuccessFragmentReg;
+    private String conditionFragmentStr;
+    private String conditionJudgeStr;
+    private String conditionSuccessFragmentStr;
+
+    public AbstractCondition(String conditionFragmentReg,String conditionJudgeReg,String conditionSuccessFragmentReg){
+        this.conditionFragmentReg=conditionFragmentReg;
+        this.conditionJudgeReg = conditionJudgeReg;
+        this.conditionSuccessFragmentReg = conditionSuccessFragmentReg;
     }
 
-    public String getTotalStr() {
-        return totalStr;
+    public String getOriginalSql() {
+        return originalSql;
     }
 
-    public void setTotalStr(String totalStr) {
-        this.totalStr = totalStr;
+    public void setOriginalSql(String originalSql) {
+        this.originalSql = originalSql;
     }
 
-    public String getStartReg() {
-        return startReg;
+    public Integer getStartIndex() {
+        return startIndex;
     }
 
-    public String[] getAttributesReg() {
-        return attributesReg;
+    public void setStartIndex(Integer startIndex) {
+        this.startIndex = startIndex;
     }
 
-    public void setAttributesReg(String[] attributesReg) {
-        this.attributesReg = attributesReg;
+    public Integer getEndIndex() {
+        return endIndex;
     }
 
-    public void setStartReg(String startReg) {
-        this.startReg = startReg;
+    public void setEndIndex(Integer endIndex) {
+        this.endIndex = endIndex;
     }
 
-    public String getEndReg() {
-        return endReg;
+    public String getConditionFragmentReg() {
+        return conditionFragmentReg;
     }
 
-    public void setEndReg(String endReg) {
-        this.endReg = endReg;
+    public void setConditionFragmentReg(String conditionFragmentReg) {
+        this.conditionFragmentReg = conditionFragmentReg;
     }
 
-    public List<String> getAttributes() {
-        return attributes;
+    public String getConditionJudgeReg() {
+        return conditionJudgeReg;
     }
 
-    public void setAttributes(List<String> attributes) {
-        this.attributes = attributes;
+    public void setConditionJudgeReg(String conditionJudgeReg) {
+        this.conditionJudgeReg = conditionJudgeReg;
     }
 
-    public String getStartValue() {
-        return startValue;
+    public String getConditionSuccessFragmentReg() {
+        return conditionSuccessFragmentReg;
     }
 
-    public void setStartValue(String startValue) {
-        this.startValue = startValue;
+    public void setConditionSuccessFragmentReg(String conditionSuccessFragmentReg) {
+        this.conditionSuccessFragmentReg = conditionSuccessFragmentReg;
     }
 
-    public String getEndValue() {
-        return endValue;
+    public String getConditionFragmentStr() {
+        return conditionFragmentStr;
     }
 
-    public void setEndValue(String endValue) {
-        this.endValue = endValue;
+    public void setConditionFragmentStr(String conditionFragmentStr) {
+        if(originalSql!=null && originalSql.length()>0){
+            setStartIndex(originalSql.indexOf(conditionFragmentStr));
+            setEndIndex(startIndex+conditionFragmentStr.length());
+        }
+        this.conditionFragmentStr = conditionFragmentStr;
     }
 
-    public String getConditionIfTrue() {
-        return conditionIfTrue;
+    public String getConditionJudgeStr() {
+        return conditionJudgeStr;
     }
 
-    public void setConditionIfTrue(String conditionIfTrue) {
-        this.conditionIfTrue = conditionIfTrue;
+    public void setConditionJudgeStr(String conditionJudgeStr) {
+        this.conditionJudgeStr = conditionJudgeStr.substring(1,conditionJudgeStr.length()-1);;;
+    }
+
+    public String getConditionSuccessFragmentStr() {
+        return conditionSuccessFragmentStr;
+    }
+
+    public void setConditionSuccessFragmentStr(String conditionSuccessFragmentStr) {
+        this.conditionSuccessFragmentStr = conditionSuccessFragmentStr.substring(1,conditionSuccessFragmentStr.length()-1);;
     }
 }

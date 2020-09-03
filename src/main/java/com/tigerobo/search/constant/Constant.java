@@ -36,8 +36,8 @@ public class Constant {
 
 
     public static final String select ="select";
-    public static final String update ="update";
-    public static final String insert ="insert";
+    public static final String update ="update|updateByPrimaryKey";
+    public static final String insert ="insert|";
     public static final String delete ="delete";
 
 }

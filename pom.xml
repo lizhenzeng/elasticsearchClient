@@ -5,12 +5,12 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.2.7.RELEASE</version>
+        <version>2.0.4.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.tigerobo.search</groupId>
     <artifactId>elastic-search</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.10</version>
     <name>elastic-search</name>
     <description>search tool for elastic-search</description>
 
@@ -68,7 +68,7 @@
         <dependency>
             <groupId>com.tiger.functool</groupId>
             <artifactId>functool</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.3</version>
         </dependency>
     </dependencies>
 

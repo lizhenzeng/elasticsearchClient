@@ -1,10 +1,6 @@
 package com.tigerobo.search.condition;
 
-import com.tigerobo.search.constant.Constant;
-import com.tigerobo.search.parser.ReadHelper;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -16,28 +12,36 @@ public class ConditionParser {
     //
     public <T extends AbstractCondition> List<T> parser(String str,Class<T> clzz) {
         try {
+            List<T> conditions = new ArrayList<>();
             T t = clzz.newInstance();
-            List<String> startRegs = getMatchStrByReg(str, t.getStartReg());
-            List<String> endRegs = getMatchStrByReg(str, t.getEndReg());
-            List<String> result = getSplitIndex(startRegs, endRegs, str);
-            return  result.stream().map(val->{
-                T instance = null;
-                try {
-                    instance = clzz.newInstance();
-                    instance.setTotalStr(val);
-                    instance.setStartValue(getMatchStrByReg(val,instance.getStartReg()).get(0));
-                    instance.setEndValue(getMatchStrByReg(val,instance.getEndReg()).get(0));
-                    instance.setConditionIfTrue(val.replaceAll(instance.getStartValue(), Constant.empty).replaceAll(instance.getEndValue(),Constant.empty));
-                    instance.setAttributes(Arrays.stream(instance.getAttributesReg()).map(var->getMatchStrByReg(val,var).get(0)).collect(Collectors.toList()));
-                }catch (Exception e){
-                    e.printStackTrace();
+            List<String> conditionFragmentStrs = getMatchStrByReg(str, t.getConditionFragmentReg());
+            for(String conditionFragmentStr:conditionFragmentStrs){
+                List<String> ifConditionStrs = new ArrayList<>();
+                getConditionFragmentByIfSymbol(conditionFragmentStr,ifConditionStrs);
+                for(String condition:ifConditionStrs){
+                    t.setOriginalSql(str);
+                    t.setConditionJudgeStr(getMatchStrByReg(condition, t.getConditionJudgeReg()).get(0));
+                    t.setConditionSuccessFragmentStr(getMatchStrByReg(condition, t.getConditionSuccessFragmentReg()).get(0));
+                    t.setConditionFragmentStr(condition);
+                    conditions.add(t);
+                    t = clzz.newInstance();
                 }
-                return instance;
-            }).filter(val->val!=null).collect(Collectors.toList());
-        }catch (Exception e){}
+
+            }
+           return conditions;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         return null;
     }
 
+    public void getConditionFragmentByIfSymbol(String conditionFragmentStrs,List<String> matchIfConditionValues){
+         Integer endIndex =  conditionFragmentStrs.indexOf("</if>");
+         if(endIndex!=-1){
+             matchIfConditionValues.add(conditionFragmentStrs.substring(0,endIndex+5));
+             getConditionFragmentByIfSymbol(conditionFragmentStrs.substring(endIndex+5),matchIfConditionValues);
+         }
+    }
 
 
 

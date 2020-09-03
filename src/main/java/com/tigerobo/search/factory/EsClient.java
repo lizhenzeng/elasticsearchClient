@@ -11,15 +11,15 @@ import org.springframework.context.annotation.Bean;
 @AutoConfigureAfter({EsConfiguration.class})
 public class EsClient {
 
-    private RestHighLevelClient restHighLevelClient;
-    private EsConfiguration esConfiguration;
+    private static RestHighLevelClient restHighLevelClient;
+    private static EsConfiguration configuration;
 
     public EsConfiguration getEsConfiguration() {
-        return esConfiguration;
+        return configuration;
     }
 
     public void setEsConfiguration(EsConfiguration esConfiguration) {
-        this.esConfiguration = esConfiguration;
+        this.configuration = esConfiguration;
     }
 
     public RestHighLevelClient getRestHighLevelClient() {
@@ -31,9 +31,9 @@ public class EsClient {
     }
 
     @Bean
-    public RestHighLevelClient getEsClient(EsConfiguration esConfiguration){
-        this.esConfiguration = esConfiguration;
-        this.restHighLevelClient =  new RestHighLevelClient(RestClient.builder(new HttpHost(esConfiguration.getHost(), esConfiguration.getPort())));
+    public static RestHighLevelClient getEsClient(EsConfiguration esConfiguration){
+        configuration = esConfiguration;
+        restHighLevelClient =  new RestHighLevelClient(RestClient.builder(new HttpHost(esConfiguration.getHost(), esConfiguration.getPort())));
         return restHighLevelClient;
     }
 }

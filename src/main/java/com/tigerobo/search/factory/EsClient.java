@@ -7,6 +7,9 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.context.annotation.Bean;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @org.springframework.context.annotation.Configuration
 @AutoConfigureAfter({EsConfiguration.class})
 public class EsClient {
@@ -31,9 +34,14 @@ public class EsClient {
     }
 
     @Bean
-    public static RestHighLevelClient getEsClient(EsConfiguration esConfiguration){
+    public static RestHighLevelClient getEsClient(EsConfiguration esConfiguration) {
         configuration = esConfiguration;
-        restHighLevelClient =  new RestHighLevelClient(RestClient.builder(new HttpHost(esConfiguration.getHost(), esConfiguration.getPort())));
+        if (esConfiguration.getHosts() != null && !esConfiguration.getHosts().isEmpty()) {
+            List<HttpHost> hostList = esConfiguration.getHosts().stream().map(val -> new HttpHost(val.split(":")[0], Integer.valueOf(val.split(":")[1]))).collect(Collectors.toList());
+            restHighLevelClient = new RestHighLevelClient(RestClient.builder(hostList.toArray(new HttpHost[hostList.size()])));
+        } else {
+            restHighLevelClient = new RestHighLevelClient(RestClient.builder(new HttpHost(esConfiguration.getHost(), esConfiguration.getPort())));
+        }
         return restHighLevelClient;
     }
 }

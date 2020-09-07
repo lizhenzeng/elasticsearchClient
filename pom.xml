@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.tigerobo.search</groupId>
     <artifactId>elastic-search</artifactId>
-    <version>1.0.10</version>
+    <version>1.0.11</version>
     <name>elastic-search</name>
     <description>search tool for elastic-search</description>
 
